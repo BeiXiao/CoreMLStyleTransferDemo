@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="JDc-js-Sos">
+    <device id="retina5_9" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Style Transfer-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Style_Transfer_Demo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="GoldFluid" translatesAutoresizingMaskIntoConstraints="NO" id="7w2-Ic-FOI">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                            </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zsR-nf-Ba3">
+                                <rect key="frame" x="105.66666666666669" y="704" width="164" height="64"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="64" id="dtD-A1-axq"/>
+                                    <constraint firstAttribute="width" constant="164" id="zgW-N7-ouT"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Choose an Image" image="btn_choose_image"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="chooseImage:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YCe-CY-UA8"/>
+                                </connections>
+                            </button>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vAu-b3-Fs0">
+                                <rect key="frame" x="0.0" y="588" width="375" height="108"/>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="vAu-b3-Fs0" firstAttribute="trailing" secondItem="7w2-Ic-FOI" secondAttribute="trailing" id="11A-oH-VuQ"/>
+                            <constraint firstAttribute="trailing" secondItem="7w2-Ic-FOI" secondAttribute="trailing" id="3eV-pC-Nu9"/>
+                            <constraint firstAttribute="bottom" secondItem="7w2-Ic-FOI" secondAttribute="bottom" id="8jE-G5-LUV"/>
+                            <constraint firstItem="zsR-nf-Ba3" firstAttribute="centerX" secondItem="7w2-Ic-FOI" secondAttribute="centerX" id="MFD-Rr-Q9L"/>
+                            <constraint firstItem="zsR-nf-Ba3" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" constant="-10" id="Puh-Iy-AEC"/>
+                            <constraint firstItem="7w2-Ic-FOI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="QiA-4e-54H"/>
+                            <constraint firstItem="vAu-b3-Fs0" firstAttribute="leading" secondItem="7w2-Ic-FOI" secondAttribute="leading" id="Zf2-W7-ntj"/>
+                            <constraint firstItem="vAu-b3-Fs0" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="544" id="aFp-tI-IyI"/>
+                            <constraint firstItem="zsR-nf-Ba3" firstAttribute="top" secondItem="vAu-b3-Fs0" secondAttribute="bottom" constant="8" symbolic="YES" id="oAM-2z-8UW"/>
+                            <constraint firstItem="7w2-Ic-FOI" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="qjE-zq-rJU"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Style Transfer" id="NJO-Fo-j4O"/>
+                    <nil key="simulatedTopBarMetrics"/>
+                    <connections>
+                        <outlet property="imageView" destination="7w2-Ic-FOI" id="DaT-AV-xrf"/>
+                        <outlet property="scrollView" destination="vAu-b3-Fs0" id="Ucf-o2-Naj"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1076" y="133.00492610837438"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="0Uk-Ks-QDw">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="JDc-js-Sos" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="uuo-6q-P1v">
+                        <rect key="frame" x="0.0" y="44" width="375" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="W34-mM-nGy"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="FTO-rb-PNn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="239" y="134"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="GoldFluid" width="564" height="1068"/>
+        <image name="btn_choose_image" width="172" height="72"/>
+    </resources>
+</document>
