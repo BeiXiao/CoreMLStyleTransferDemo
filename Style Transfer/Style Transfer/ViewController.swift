@@ -91,10 +91,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             // 获取对应的风格图片输出
             do {
-                let predictionOutput = try model.prediction(image: imageBuffer, index: styleArray!)
-                let ciImage = CIImage(cvPixelBuffer: predictionOutput.stylizedImage)
+                let output = try model.prediction(image: imageBuffer, index: styleArray!)
+                let ciImage = CIImage(cvPixelBuffer: output.stylizedImage)
                 let tempContext = CIContext(options: nil)
-                let tempImage = tempContext.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: CVPixelBufferGetWidth(predictionOutput.stylizedImage), height: CVPixelBufferGetHeight(predictionOutput.stylizedImage)))
+                let stylizedImage = output.stylizedImage
+                let tempImage = tempContext.createCGImage(ciImage, from: CGRect(x: 0, y: 0,
+                                                                                width:CVPixelBufferGetWidth(stylizedImage),
+                                                                                height:CVPixelBufferGetHeight(stylizedImage)))
                 DispatchQueue.main.async { [weak self]  in
                     guard let sself = self else { return }
                     sself.imageView.image = UIImage(cgImage: tempImage!)
@@ -107,36 +110,68 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     // Image 转为 PixelBuffer
     func pixelBuffer(from image: UIImage) -> CVPixelBuffer? {
-        UIGraphicsBeginImageContextWithOptions(CGSize(width: 600, height: 600), true, 2.0)
-        image.draw(in: CGRect(x: 0, y: 0, width: 600, height: 600))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue] as CFDictionary
-        var pixelBuffer : CVPixelBuffer?
-        let status = CVPixelBufferCreate(kCFAllocatorDefault, 600, 600, kCVPixelFormatType_32ARGB, attrs, &pixelBuffer)
-        guard (status == kCVReturnSuccess) else {
+        let width = image.size.width
+        let height = image.size.height
+        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
+                     kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue] as CFDictionary
+        var pixelBuffer: CVPixelBuffer?
+        let status = CVPixelBufferCreate(kCFAllocatorDefault,
+                                         Int(width),
+                                         Int(height),
+                                         kCVPixelFormatType_32ARGB,
+                                         attrs,
+                                         &pixelBuffer)
+        
+        guard let resultPixelBuffer = pixelBuffer, status == kCVReturnSuccess else {
             return nil
         }
-
-        CVPixelBufferLockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
-        let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer!)
-
+        
+        CVPixelBufferLockBaseAddress(resultPixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
+        let pixelData = CVPixelBufferGetBaseAddress(resultPixelBuffer)
+        
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-        let context = CGContext(data: pixelData, width: 600, height: 600, bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer!), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue)
-        context?.translateBy(x: 0, y: 600)
-        context?.scaleBy(x: 1.0, y: -1.0)
-        UIGraphicsPushContext(context!)
-        image.draw(in: CGRect(x: 0, y: 0, width: 600, height: 600))
+        guard let context = CGContext(data: pixelData,
+                                      width: Int(width),
+                                      height: Int(height),
+                                      bitsPerComponent: 8,
+                                      bytesPerRow: CVPixelBufferGetBytesPerRow(resultPixelBuffer),
+                                      space: rgbColorSpace,
+                                      bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue) else {
+                                        return nil
+        }
+        
+        context.translateBy(x: 0, y: height)
+        context.scaleBy(x: 1.0, y: -1.0)
+        
+        UIGraphicsPushContext(context)
+        image.draw(in: CGRect(x: 0, y: 0, width: width, height: height))
         UIGraphicsPopContext()
-        CVPixelBufferUnlockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
-        return pixelBuffer
+        CVPixelBufferUnlockBaseAddress(resultPixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
+        
+        return resultPixelBuffer
+    }
+
+    // 缩放图片（为了加快转换速度）
+    func imageWithImage(image: UIImage, scaledToWidth: CGFloat) -> UIImage {
+        let oldWidth = image.size.width
+        let scaleFactor = scaledToWidth / oldWidth
+        
+        let newHeight = image.size.height * scaleFactor
+        let newWidth = oldWidth * scaleFactor
+        
+        UIGraphicsBeginImageContext(CGSize(width:newWidth, height:newHeight))
+        image.draw(in: CGRect(x:0, y:0, width:newWidth, height:newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage!
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
         if let pickedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage {
-            imageView.image = pickedImage
-            currentImage = pickedImage
+            let image = imageWithImage(image: pickedImage, scaledToWidth: imageView.frame.size.width)
+            imageView.image = image
+            currentImage = image
         }
         dismiss(animated: true, completion: nil)
     }
