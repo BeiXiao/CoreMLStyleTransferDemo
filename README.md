@@ -1,5 +1,11 @@
-# A simple demo for Core ML and Turi Create
+# Turi Create Style Transfer Demo 
 
-This demo shows you how to use Core ML and Turi Create to create a "Style Transfer" ML model. For the full tutorial, please visit the following link:
+Core ML and Turi Create to create a "Style Transfer" ML model.
 
-https://www.appcoda.com/coreml-turi-create/
+// 训练代码可参考
+https://apple.github.io/turicreate/docs/userguide/style_transfer/
+
+目录说明：
+/data/input // 训练数据   
+/data/ouput // 训练好的模型
+/Style Transer // iOS 客户端工程
