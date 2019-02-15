@@ -73,18 +73,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBAction func transformImage(_ sender: Any) {
         DispatchQueue.global().async { [weak self]  in
             guard let sself = self else { return }
+            // 读取模型
             let model = MyStyleTransfer()
             let numStyles = sself.styleArray.count
             
+            // 重置风格向量矩阵
             let styleArray = try? MLMultiArray(shape: [numStyles] as [NSNumber], dataType: .double)
             for i in 0...((styleArray?.count)!-1) {
                 styleArray?[i] = 0.0
             }
             
+            // 应用选择的风格
             styleArray?[sself.styleIndex] = 1.0
+            
             guard let image = sself.currentImage else { return }
             guard let imageBuffer = sself.pixelBuffer(from: image) else { return }
             
+            // 获取对应的风格图片输出
             do {
                 let predictionOutput = try model.prediction(image: imageBuffer, index: styleArray!)
                 let ciImage = CIImage(cvPixelBuffer: predictionOutput.stylizedImage)
@@ -100,14 +105,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     }
     
+    // Image 转为 PixelBuffer
     func pixelBuffer(from image: UIImage) -> CVPixelBuffer? {
-        // 1
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 600, height: 600), true, 2.0)
         image.draw(in: CGRect(x: 0, y: 0, width: 600, height: 600))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-
-        // 2
         let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue] as CFDictionary
         var pixelBuffer : CVPixelBuffer?
         let status = CVPixelBufferCreate(kCFAllocatorDefault, 600, 600, kCVPixelFormatType_32ARGB, attrs, &pixelBuffer)
@@ -115,19 +118,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             return nil
         }
 
-        // 3
         CVPixelBufferLockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
         let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer!)
 
-        // 4
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
         let context = CGContext(data: pixelData, width: 600, height: 600, bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer!), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue)
-
-        // 5
         context?.translateBy(x: 0, y: 600)
         context?.scaleBy(x: 1.0, y: -1.0)
-
-        // 6
         UIGraphicsPushContext(context!)
         image.draw(in: CGRect(x: 0, y: 0, width: 600, height: 600))
         UIGraphicsPopContext()
@@ -136,9 +133,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-// Local variable inserted by Swift 4.2 migrator.
-let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
-
+        let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
         if let pickedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage {
             imageView.image = pickedImage
             currentImage = pickedImage
